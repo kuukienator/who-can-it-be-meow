@@ -112,10 +112,10 @@
             container.classList.remove('sax-time');
             requestAnimationFrame(checkTime);
         });
-        audioElement.addEventListener("pause", (e) => {
+        audioElement.addEventListener("pause", () => {
             console.log("time", audioElement.currentTime);
         });
-        audioElement.addEventListener("waiting", (e) => {
+        audioElement.addEventListener("waiting", () => {
             saxTime = false;
             container.classList.remove('sax-time');
             requestAnimationFrame(checkTime);
