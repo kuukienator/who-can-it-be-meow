@@ -70,6 +70,25 @@
         .cat-image, .cat-image-idle {
             max-width: 95vw;
         }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1) rotate(59deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05) rotate(59deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1) rotate(59deg);
+                opacity: 1;
+            }
+        }
+
+        .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +96,7 @@
     <div class="container idle">
         <img class="cat-image-idle" src="./public/cat-idle-1.png" alt="">
         <img class="cat-image" src="./public/cat-1.png" alt="">
-        <img class="sax-image" src="./public/sax-1.png" alt="">
+        <img class="sax-image pulse" src="./public/sax-1.png" alt="">
         <img class="glasses-image" src="./public/glasses-1.png" alt="">
     </div>
     <audio class="audio-player" controls src="./public/who-can-it-be-now.mp3" loop></audio>
