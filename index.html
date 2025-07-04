@@ -58,9 +58,6 @@
         .sax-time .cat-image {
             transform: rotateY(180deg);
         }
-        .audio-player {
-            visibility: hidden;
-        }
         .idle .cat-image {
             display: none;
         }
@@ -123,46 +120,56 @@
         <img class="sax-image pulse" src="./public/sax-1.png" alt="">
         <img class="glasses-image colors" src="./public/glasses-1.png" alt="">
     </div>
-    <audio class="audio-player" controls src="./public/who-can-it-be-now.mp3" loop></audio>
     <script>
-        const audioElement = document.querySelector('.audio-player');
-        const container = document.querySelector('.container');
+        const init = async () => {
+            const container = document.querySelector('.container');
 
-        const targetTime = 2.2;
-        let saxTime = false;
+            const targetTime = 2;
+            let saxTime = false;
+            let hasStarted = false;
 
-        function checkTime() {
-            if (!saxTime && audioElement.currentTime >= targetTime) {
-                saxTime = true;
-                container.classList.add('sax-time');
-            }
+            const audioCtx = new window.AudioContext();
+            const source = audioCtx.createBufferSource();
+            const arrayBuffer = await fetch('./public/who-can-it-be-now-loop.mp3').then((res) => res.arrayBuffer());
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            const duration = audioBuffer.duration;
 
-            if (!saxTime && !audioElement.paused && !audioElement.ended) {
+            source.buffer = audioBuffer;
+            source.loop = true;
+            source.connect(audioCtx.destination);
+
+            function checkTime() {
+                if (saxTime && audioCtx.currentTime % duration <= targetTime) {
+                    saxTime = false;
+                    container.classList.remove('sax-time');
+                }
+
+                if (!saxTime && audioCtx.currentTime % duration >= targetTime) {
+                    saxTime = true;
+                    container.classList.add('sax-time');
+                }
+
                 requestAnimationFrame(checkTime);
             }
+
+            container.addEventListener('click', () => {
+                container.classList.remove('idle');
+                if (audioCtx.state === "suspended") {
+                    if (!hasStarted) {
+                        source.start();
+                        hasStarted = true;
+                    }
+                    audioCtx.resume();
+                    requestAnimationFrame(checkTime);
+                } else {
+                    audioCtx.suspend();
+                }
+            });
+
+            requestAnimationFrame(checkTime);
         }
 
-        container.addEventListener('click', () => {
-            container.classList.remove('idle');
-            if (audioElement.paused) {
-                audioElement.play();
-            } else {
-                audioElement.pause();
-            }
-        });
-
-        audioElement.addEventListener('play', () => {
-            container.classList.remove('sax-time');
-            requestAnimationFrame(checkTime);
-        });
-        audioElement.addEventListener("pause", () => {
-            console.log("time", audioElement.currentTime);
-        });
-        audioElement.addEventListener("waiting", () => {
-            saxTime = false;
-            container.classList.remove('sax-time');
-            requestAnimationFrame(checkTime);
-        });
+        init();
     </script>
 </body>
 </html>
